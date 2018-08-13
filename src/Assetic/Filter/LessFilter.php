@@ -105,23 +105,21 @@ class LessFilter extends BaseNodeFilter implements DependencyExtractorInterface
     {
         static $format = <<<'EOF'
 var less = require('less');
-var sys  = require(process.binding('natives').util ? 'util' : 'sys');
 
-less.render(%s, %s, function(error, css) {
-    if (error) {
-        less.writeError(error);
-        process.exit(2);
-    }
+less.render(%s, %s).then(function(css) {
     try {
         if (typeof css == 'string') {
-            sys.print(css);
+            console.log(css);
         } else {
-            sys.print(css.css);
+            console.log(css.css);
         }
     } catch (e) {
-        less.writeError(error);
+        console.log(e.message);
         process.exit(3);
     }
+}, function(error){
+    console.log(error);
+    process.exit(2);
 });
 
 EOF;
@@ -132,6 +130,7 @@ EOF;
             $parserOptions['paths'] = array($dir);
             $parserOptions['filename'] = basename($asset->getSourcePath());
         }
+        $parserOptions['javascriptEnabled'] = true;
 
         foreach ($this->loadPaths as $loadPath) {
             $parserOptions['paths'][] = $loadPath;
