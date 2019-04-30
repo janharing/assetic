@@ -25,7 +25,7 @@ class TwigFormulaLoader implements FormulaLoaderInterface
     private $twig;
     private $logger;
 
-    public function __construct(\Twig_Environment $twig, LoggerInterface $logger = null)
+    public function __construct(\Twig\Environment $twig, LoggerInterface $logger = null)
     {
         $this->twig = $twig;
         $this->logger = $logger;
@@ -34,7 +34,7 @@ class TwigFormulaLoader implements FormulaLoaderInterface
     public function load(ResourceInterface $resource)
     {
         try {
-            $tokens = $this->twig->tokenize(new \Twig_Source($resource->getContent(), (string) $resource));
+            $tokens = $this->twig->tokenize(new \Twig\Source($resource->getContent(), (string) $resource));
             $nodes  = $this->twig->parse($tokens);
         } catch (\Exception $e) {
             if ($this->logger) {
@@ -50,11 +50,11 @@ class TwigFormulaLoader implements FormulaLoaderInterface
     /**
      * Loads assets from the supplied node.
      *
-     * @param \Twig_Node $node
+     * @param \Twig\Node\Node $node
      *
      * @return array An array of asset formulae indexed by name
      */
-    private function loadNode(\Twig_Node $node)
+    private function loadNode(\Twig\Node\Node $node)
     {
         $formulae = array();
 
@@ -92,7 +92,7 @@ class TwigFormulaLoader implements FormulaLoaderInterface
         }
 
         foreach ($node as $child) {
-            if ($child instanceof \Twig_Node) {
+            if ($child instanceof \Twig\Node\Node) {
                 $formulae += $this->loadNode($child);
             }
         }

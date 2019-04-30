@@ -17,19 +17,19 @@ class TwigResourceTest extends \PHPUnit_Framework_TestCase
 {
     protected function setUp()
     {
-        if (!class_exists('Twig_Environment')) {
+        if (!class_exists('\Twig\Environment')) {
             $this->markTestSkipped('Twig is not installed.');
         }
     }
 
     public function testInvalidTemplateNameGetContent()
     {
-        $loader = $this->prophesize('Twig_LoaderInterface');
-        if (!method_exists('Twig_LoaderInterface', 'getSourceContext')) {
-            $loader->willImplement('Twig_SourceContextLoaderInterface');
+        $loader = $this->prophesize('\Twig\Loader\LoaderInterface');
+        if (!method_exists('\Twig\Loader\LoaderInterface', 'getSourceContext')) {
+            $loader->willImplement('\Twig\Loader\SourceContextLoaderInterface');
         }
 
-        $loader->getSourceContext('asdf')->willThrow(new \Twig_Error_Loader(''));
+        $loader->getSourceContext('asdf')->willThrow(new \Twig\Error\LoaderError(''));
 
         $resource = new TwigResource($loader->reveal(), 'asdf');
         $this->assertEquals('', $resource->getContent());
@@ -40,15 +40,15 @@ class TwigResourceTest extends \PHPUnit_Framework_TestCase
      */
     public function testInvalidTemplateNameGetContentWithLegacyLoader()
     {
-        if (!method_exists('Twig_LoaderInterface', 'getSource')) {
+        if (!method_exists('\Twig\Loader\LoaderInterface', 'getSource')) {
             $this->markTestSkipped('This test does not make sense on Twig 2.x.');
         }
 
-        $loader = $this->getMockBuilder('Twig_LoaderInterface')->getMock();
+        $loader = $this->getMockBuilder('\Twig\Loader\LoaderInterface')->getMock();
         $loader->expects($this->once())
             ->method('getSource')
             ->with('asdf')
-            ->will($this->throwException(new \Twig_Error_Loader('')));
+            ->will($this->throwException(new \Twig\Error\LoaderError('')));
 
         $resource = new TwigResource($loader, 'asdf');
         $this->assertEquals('', $resource->getContent());
@@ -56,11 +56,11 @@ class TwigResourceTest extends \PHPUnit_Framework_TestCase
 
     public function testInvalidTemplateNameIsFresh()
     {
-        $loader = $this->getMockBuilder('Twig_LoaderInterface')->getMock();
+        $loader = $this->getMockBuilder('\Twig\Loader\LoaderInterface')->getMock();
         $loader->expects($this->once())
             ->method('isFresh')
             ->with('asdf', 1234)
-            ->will($this->throwException(new \Twig_Error_Loader('')));
+            ->will($this->throwException(new \Twig\Error\LoaderError('')));
 
         $resource = new TwigResource($loader, 'asdf');
         $this->assertFalse($resource->isFresh(1234));
